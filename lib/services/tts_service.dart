@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
-import 'package:sonify/models/audio_file.dart';
+import 'package:sonify/core/models/audio_file.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 

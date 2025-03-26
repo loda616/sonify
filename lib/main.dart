@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sonify/screens/home_screen.dart';
-import 'package:sonify/utils/theme_config.dart';
-import 'models/theme_provider.dart';
+import 'package:sonify/app/home_screen.dart';
+import 'package:sonify/core/themes/theme_config.dart';
+import 'features/theme/presentation/providers/theme_provider.dart';
 
 
 void main() {
