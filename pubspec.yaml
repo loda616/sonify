@@ -1,6 +1,5 @@
 name: sonify
 description: "A new Flutter project."
-
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -22,7 +21,8 @@ dependencies:
   share_plus: ^10.1.4
   just_audio: ^0.9.46
   flutter_tts: ^4.2.2
-  # Native splash packages removed
+
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -35,3 +35,16 @@ flutter:
     - assets/images/
 
   uses-material-design: true
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+flutter_launcher_icons:
+  ios: true
+  android: true
+  remove_alpha_ios: true
+  image_path_ios: "assets/icons/ios/AppIcon~ios-marketing.png"
+  # For Android, use the appropriate file from your android folder
+  image_path_android: "assets/icons/android/play_store_512.png"
+
