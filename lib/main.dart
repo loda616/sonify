@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sonify/app/home_screen.dart';
 import 'package:sonify/core/themes/theme_config.dart';
+import 'app/splash_screen.dart';
 import 'features/theme/presentation/providers/theme_provider.dart';
 
 
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           theme: getLightTheme(),
           darkTheme: getDarkTheme(),
           themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: const HomeScreen(),
+          home: const SplashScreen(),
         );
       },
     );
