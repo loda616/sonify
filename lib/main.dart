@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'app/splash_screen.dart';
 import 'core/themes/theme_config.dart';
 import 'features/theme/presentation/providers/theme_provider.dart';
@@ -8,6 +10,9 @@ import 'features/theme/presentation/providers/theme_provider.dart';
 void main() async {
   // Initialize Flutter binding
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Hide system UI overlays like the splash screen
   SystemChrome.setEnabledSystemUIMode(
@@ -36,7 +41,8 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: getLightTheme(),
           darkTheme: getDarkTheme(),
-          themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          themeMode:
+              themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
           home: const SplashScreen(), // Your custom Flutter splash screen
         );
       },

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392705200270",
+    "project_id": "sonify-4cb94",
+    "storage_bucket": "sonify-4cb94.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392705200270:android:cd37ea98bf33700b2cf9df",
+        "android_client_info": {
+          "package_name": "com.example.sonify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC-S9yoF9n3U5JrcT2lSnE2QSaitseg8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
