@@ -23,9 +23,10 @@ jobs:
           flutter-version: '3.16.9'
           channel: 'stable'
 
-      - name: Update Flutter SDK constraints
-        run: |
-          sed -i 's/sdk: \^3.7.0-323.2.beta/sdk: ">=3.0.0 <4.0.0"/' pubspec.yaml
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.5.0'
 
       - name: Install dependencies
         run: flutter pub get
@@ -44,4 +45,4 @@ jobs:
             Changes in this release:
             - Automated distribution via GitHub Actions
             - Built from commit: ${{ github.sha }}
-            - Branch: ${{ github.ref_name }} 
+            - Branch: ${{ github.ref_name }}
