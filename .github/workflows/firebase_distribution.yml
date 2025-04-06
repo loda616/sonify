@@ -1,18 +1,21 @@
-name: Firebase App Distribution
+name: Build and Distribute to Firebase
 
 on:
   push:
     branches:
-      - main  # or your default branch
-  pull_request:
-    branches:
-      - main  # or your default branch
+      - '*'  # This will run on all branches
 
 jobs:
   build_and_distribute:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -34,7 +37,7 @@ jobs:
           groups: testers
           file: build/app/outputs/flutter-apk/app-release.apk
           releaseNotes: |
-            New version of Sonify app
             Changes in this release:
             - Automated distribution via GitHub Actions
-            - Built from commit: ${{ github.sha }} 
+            - Built from commit: ${{ github.sha }}
+            - Branch: ${{ github.ref_name }} 
