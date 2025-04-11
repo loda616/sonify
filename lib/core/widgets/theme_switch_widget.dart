@@ -5,7 +5,7 @@ import 'package:sonify/features/theme/presentation/providers/theme_provider.dart
 import 'package:sonify/core/themes/theme_config.dart';
 
 class ThemeSwitchWidget extends StatelessWidget {
-  const ThemeSwitchWidget({Key? key}) : super(key: key);
+  const ThemeSwitchWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

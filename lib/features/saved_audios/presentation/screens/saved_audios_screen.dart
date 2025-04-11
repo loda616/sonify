@@ -9,7 +9,7 @@ import '../../../text_to_speech/presentaiont/widgets/audio_player_widget.dart';
 
 
 class SavedAudiosScreen extends StatefulWidget {
-  const SavedAudiosScreen({Key? key}) : super(key: key);
+  const SavedAudiosScreen({super.key});
 
   @override
   State<SavedAudiosScreen> createState() => _SavedAudiosScreenState();

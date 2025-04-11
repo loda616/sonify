@@ -8,7 +8,7 @@ import '../features/theme/presentation/providers/theme_provider.dart';
 import '../core/widgets/theme_switch_widget.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();

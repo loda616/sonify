@@ -23,10 +23,10 @@ jobs:
           flutter-version: '3.16.9'
           channel: 'stable'
 
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@v1
+      - name: Setup Android NDK
+        uses: android-actions/setup-android@v2
         with:
-          sdk: '3.5.0'
+          ndk-version: '27.0.12077973'
 
       - name: Install dependencies
         run: flutter pub get
