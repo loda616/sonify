@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'app/splash_screen.dart';
 import 'core/themes/theme_config.dart';
 import 'features/theme/presentation/providers/theme_provider.dart';
+import 'services/chattts_service.dart';
 
 void main() async {
   // Initialize Flutter binding
@@ -20,13 +21,17 @@ void main() async {
     overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
   );
 
-  // Run the app
+  final chatTTSService = ChatTTSService();
+  await chatTTSService.initialize();
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
       child: const MyApp(),
     ),
   );
+
+  chatTTSService.dispose();
 }
 
 class MyApp extends StatelessWidget {
