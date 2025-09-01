@@ -5,8 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
 import 'package:sonify/core/models/audio_file.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 class TTSService {
@@ -149,14 +149,14 @@ class TTSService {
       // Create a metadata file to store information about the audio
       final metadataFile = File(path.join(audioDir.path, '$id.json'));
       final now = DateTime.now();
-      final metadata = {
-        'id': id,
-        'title': title,
-        'filePath': destinationPath,
-        'createdAt': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
-      };
+      final audioFile = AudioFile(
+        id: id,
+        title: title,
+        filePath: destinationPath,
+        createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
+      );
 
-      await metadataFile.writeAsString(metadata.toString());
+      await metadataFile.writeAsString(jsonEncode(audioFile.toJson()));
 
       return true;
     } catch (e) {
@@ -185,22 +185,11 @@ class TTSService {
       for (final file in metadataFiles) {
         try {
           final content = await file.readAsString();
-          // In a real app, use a proper JSON parser
-          final id = _extractValue(content, 'id');
-          final title = _extractValue(content, 'title');
-          final filePath = _extractValue(content, 'filePath');
-          final createdAt = _extractValue(content, 'createdAt');
+          final audioFile = AudioFile.fromJson(jsonDecode(content));
 
-          final audioFile = File(filePath);
-          if (await audioFile.exists()) {
-            audioFiles.add(
-              AudioFile(
-                id: id,
-                title: title,
-                filePath: filePath,
-                createdAt: createdAt,
-              ),
-            );
+          final audioFileOnDisk = File(audioFile.filePath);
+          if (await audioFileOnDisk.exists()) {
+            audioFiles.add(audioFile);
           }
         } catch (e) {
           debugPrint('Error parsing metadata file: $e');
@@ -216,14 +205,6 @@ class TTSService {
       debugPrint('Error getting saved audios: $e');
       return [];
     }
-  }
-
-  // Simple helper to extract values from a stringified JSON
-  // In a real app, use a proper JSON parser
-  String _extractValue(String jsonString, String key) {
-    final regex = RegExp('$key: (.*?)(,|})', multiLine: true);
-    final match = regex.firstMatch(jsonString);
-    return match?.group(1)?.trim() ?? '';
   }
 
   Future<bool> deleteAudio(String id) async {
