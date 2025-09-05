@@ -1,0 +1,6 @@
+<!-- This is a placeholder for the splash screen image.
+     You can replace this with your own drawable resource (e.g., a logo). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFFFFF" />
+</shape>
