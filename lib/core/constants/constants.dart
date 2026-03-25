@@ -3,24 +3,29 @@ class AppConstants {
   static const String appName = 'Sonify';
   static const String appVersion = '1.0.0';
 
-  // Default Values
-  static const double defaultPitch = 1.0;
+  // TTS Defaults
   static const double defaultSpeed = 1.0;
   static const String defaultVoice = 'Default';
+  static const int defaultSpeakerId = 0;
 
-  // Pitch and Speed limits
-  static const double minPitch = 0.5;
-  static const double maxPitch = 2.0;
+  // Speed limits (pitch removed — Piper doesn't support pitch control)
   static const double minSpeed = 0.5;
-  static const double maxSpeed = 2.0;
+  static const double maxSpeed = 3.0;
+
+  // Text limits
+  static const int maxTextLength = 5000;
+  static const int maxTextLengthForInstantGeneration = 200;
+
+  // Text History
+  static const int maxTextHistory = 10;
 
   // Storage Keys
   static const String storageKeyTheme = 'theme_mode';
   static const String storageKeyDefaultVoice = 'default_voice';
-  static const String storageKeyDefaultPitch = 'default_pitch';
   static const String storageKeyDefaultSpeed = 'default_speed';
+  static const String storageKeyDefaultModelId = 'default_model_id';
+  static const String storageKeyTextHistory = 'text_history';
 
-  // Model Info
-  static const String modelVersion = '1.0.0';
-  static const String modelName = 'tts_model.tflite';
+  // Info
+  static const String engineVersion = 'sherpa-onnx';
 }

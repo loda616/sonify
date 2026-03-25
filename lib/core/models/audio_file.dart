@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class AudioFile {
   final String id;
   final String title;
@@ -16,10 +14,10 @@ class AudioFile {
   // Factory constructor to create an instance from a map (JSON)
   factory AudioFile.fromJson(Map<String, dynamic> json) {
     return AudioFile(
-      id: json['id'],
-      title: json['title'],
-      filePath: json['filePath'],
-      createdAt: json['createdAt'],
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? 'Untitled',
+      filePath: json['filePath'] as String? ?? '',
+      createdAt: json['createdAt'] as String? ?? '',
     );
   }
 

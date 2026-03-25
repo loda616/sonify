@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
+import 'package:sonify/core/di/service_locator.dart';
+import 'package:sonify/l10n/app_localizations.dart';
+import 'package:sonify/services/tts_engine.dart';
 import 'home_screen.dart';
+
+enum _SplashStatus { loading, preparing, ready, failed }
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,22 +14,23 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
   late Animation<double> _scaleAnimation;
+  _SplashStatus _status = _SplashStatus.loading;
+  bool _hasError = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize animation controller
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
 
-    // Create fade-in animation
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -33,7 +38,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       ),
     );
 
-    // Create scale animation
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -41,15 +45,40 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       ),
     );
 
-    // Start animation
     _animationController.forward();
+    _initializeApp();
+  }
 
-    // Navigate to home screen after delay
-    Timer(const Duration(seconds: 4), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    });
+  Future<void> _initializeApp() async {
+    try {
+      setState(() => _status = _SplashStatus.preparing);
+      final engine = sl<TtsEngine>();
+      await engine.initialize();
+
+      setState(() => _status = _SplashStatus.ready);
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const HomeScreen(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('App initialization failed: $e');
+      if (mounted) {
+        _animationController.stop();
+        setState(() {
+          _status = _SplashStatus.failed;
+          _hasError = true;
+        });
+      }
+    }
   }
 
   @override
@@ -58,77 +87,108 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.dispose();
   }
 
+  String _resolveStatusText(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return '';
+    switch (_status) {
+      case _SplashStatus.loading:
+        return l10n.splashLoading;
+      case _SplashStatus.preparing:
+        return l10n.splashPreparing;
+      case _SplashStatus.ready:
+        return l10n.splashReady;
+      case _SplashStatus.failed:
+        return l10n.splashFailed;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Use deep blue color from the logo for the background
-    const Color logoBackgroundColor = Color(0xFF1A3684);
+    const Color bgColor = Color(0xFF1A3684);
 
     return Scaffold(
-      backgroundColor: logoBackgroundColor,
-      body: Center(
-        child: AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, child) {
-            return FadeTransition(
-              opacity: _fadeInAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo image
-                    Container(
-                      width: 220,
-                      height: 220,
-                      decoration: BoxDecoration(
-                        color: logoBackgroundColor,
-                        borderRadius: BorderRadius.circular(40),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 20,
-                            spreadRadius: 2,
+      backgroundColor: bgColor,
+      body: GestureDetector(
+        onTap: _hasError
+            ? () {
+                setState(() => _hasError = false);
+                _animationController.forward(from: 0.0);
+                _initializeApp();
+              }
+            : null,
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _fadeInAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo
+                      Container(
+                        width: 180,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(36),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 24,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(36),
+                          child: Image.asset(
+                            'assets/images/sonify-logo.png',
+                            fit: BoxFit.cover,
                           ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
-                        child: Image.asset(
-                          'assets/images/sonify-logo.png',
-                          fit: BoxFit.cover,
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 48),
+                      const SizedBox(height: 48),
 
-                    // Animated loading indicator
-                    SizedBox(
-                      width: 160,
-                      child: LinearProgressIndicator(
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00D8FF)),
-                        minHeight: 6,
-                        borderRadius: BorderRadius.circular(3),
+                      // Progress or error icon
+                      if (!_hasError)
+                        SizedBox(
+                          width: 140,
+                          child: LinearProgressIndicator(
+                            backgroundColor: Colors.white.withValues(alpha: 0.15),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFF00D8FF),
+                            ),
+                            minHeight: 4,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        )
+                      else
+                        const Icon(
+                          Icons.refresh,
+                          color: Colors.white70,
+                          size: 32,
+                        ),
+
+                      const SizedBox(height: 24),
+
+                      // Status text
+                      Text(
+                        _resolveStatusText(context),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          letterSpacing: 0.3,
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // Tagline
-                    const Text(
-                      'Transform Text to Speech',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

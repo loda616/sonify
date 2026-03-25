@@ -1,28 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../theme/presentation/providers/theme_provider.dart';
 import '../../../../services/tts_service.dart';
 import '../../../../core/themes/theme_config.dart';
-
+import '../../../../core/constants/constants.dart';
+import '../../../../core/di/service_locator.dart';
+import '../../../../l10n/app_localizations.dart';
+import 'model_manager_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final TTSService _ttsService = TTSService();
+  late final TTSService _ttsService;
   bool _isClearing = false;
   bool _isExporting = false;
+  double _defaultSpeed = AppConstants.defaultSpeed;
+
+  @override
+  void initState() {
+    super.initState();
+    _ttsService = sl<TTSService>();
+    _loadDefaultSpeed();
+  }
+
+  Future<void> _loadDefaultSpeed() async {
+    final prefs = await SharedPreferences.getInstance();
+    final speed = prefs.getDouble(AppConstants.storageKeyDefaultSpeed);
+    if (speed != null && mounted) {
+      setState(() => _defaultSpeed = speed);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final ttsService = Provider.of<TTSService>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -32,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Settings',
+              l10n.settingsTitle,
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 24),
@@ -48,17 +70,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Appearance',
+                      l10n.settingsAppearance,
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16),
                     SwitchListTile(
                       title: Text(
-                        'Dark Mode',
+                        l10n.settingsDarkMode,
                         style: theme.textTheme.bodyLarge,
                       ),
                       subtitle: Text(
-                        isDarkMode ? 'Using dark theme' : 'Using light theme',
+                        isDarkMode ? l10n.settingsDarkTheme : l10n.settingsLightTheme,
                         style: theme.textTheme.bodySmall,
                       ),
                       value: isDarkMode,
@@ -69,6 +91,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         isDarkMode ? Icons.dark_mode : Icons.light_mode,
                         color: isDarkMode ? theme.colorScheme.secondary : theme.colorScheme.primary,
                       ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Voice/TTS Settings
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.settingsVoice, style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l10n.settingsDefaultSpeed, style: theme.textTheme.bodyLarge),
+                      subtitle: Text('${_defaultSpeed.toStringAsFixed(1)}x'),
+                      trailing: SizedBox(
+                        width: 150,
+                        child: Slider(
+                          value: _defaultSpeed,
+                          min: AppConstants.minSpeed,
+                          max: AppConstants.maxSpeed,
+                          divisions: 25,
+                          label: '${_defaultSpeed.toStringAsFixed(1)}x',
+                          onChanged: (v) async {
+                            setState(() => _defaultSpeed = v);
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setDouble(AppConstants.storageKeyDefaultSpeed, v);
+                          },
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l10n.settingsTtsEngine),
+                      subtitle: Text('${ttsService.activeModel.name} (${ttsService.activeModel.language})'),
+                      trailing: const Icon(Icons.offline_bolt, color: Colors.green),
+                    ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l10n.settingsDiscoverVoices),
+                      subtitle: Text(l10n.settingsDiscoverVoicesDesc),
+                      trailing: const Icon(Icons.language, color: Colors.blue),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => const ModelManagerScreen(),
+                            transitionsBuilder: (_, animation, __, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOutCubic,
+                                )),
+                                child: child,
+                              );
+                            },
+                            transitionDuration: const Duration(milliseconds: 300),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -88,17 +180,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Storage',
+                      l10n.settingsStorage,
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16),
                     ListTile(
                       title: Text(
-                        'Clear All Saved Audio',
+                        l10n.settingsClearAll,
                         style: theme.textTheme.bodyLarge,
                       ),
-                      subtitle: const Text(
-                        'Delete all saved audio files',
+                      subtitle: Text(
+                        l10n.settingsClearAllDesc,
                       ),
                       trailing: _isClearing
                           ? const SizedBox(
@@ -115,18 +207,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Confirm Deletion'),
-                            content: const Text(
-                              'Are you sure you want to delete all saved audio files? This action cannot be undone.',
+                            title: Text(l10n.settingsClearConfirmTitle),
+                            content: Text(
+                              l10n.settingsClearConfirmMessage,
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(false),
-                                child: const Text('Cancel'),
+                                child: Text(l10n.genericCancel),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(true),
-                                child: const Text('Delete All'),
+                                child: Text(l10n.genericDeleteAll),
                               ),
                             ],
                           ),
@@ -139,15 +231,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                           try {
                             await _ttsService.clearAllSavedAudios();
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('All audio files have been deleted'),
+                              SnackBar(
+                                content: Text(l10n.settingsClearSuccess),
                               ),
                             );
                           } catch (e) {
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Error: ${e.toString()}'),
+                                content: Text(l10n.genericErrorPrefix(e.toString())),
                               ),
                             );
                           } finally {
@@ -161,11 +255,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     ListTile(
                       title: Text(
-                        'Export All Audio Files',
+                        l10n.settingsExportAll,
                         style: theme.textTheme.bodyLarge,
                       ),
-                      subtitle: const Text(
-                        'Export all audio files to device storage',
+                      subtitle: Text(
+                        l10n.settingsExportAllDesc,
                       ),
                       trailing: _isExporting
                           ? const SizedBox(
@@ -185,16 +279,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                         try {
                           final exportPath = await _ttsService.exportAllAudios();
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Audio files exported to: $exportPath'),
+                              content: Text(l10n.settingsExportSuccess(exportPath)),
                               duration: const Duration(seconds: 5),
                             ),
                           );
                         } catch (e) {
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Error: ${e.toString()}'),
+                              content: Text(l10n.genericErrorPrefix(e.toString())),
                             ),
                           );
                         } finally {
@@ -222,30 +318,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'About',
+                      l10n.settingsAbout,
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16),
                     ListTile(
-                      title: Text(
-                        'Sonify',
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                      subtitle: const Text('Version 1.0.0'),
+                      title: Text('Sonify', style: theme.textTheme.bodyLarge),
+                      subtitle: Text('v${AppConstants.appVersion} — Powered by ${AppConstants.engineVersion}'),
                       trailing: const Icon(Icons.info_outline),
                       onTap: () {
                         showAboutDialog(
                           context: context,
-                          applicationName: 'Sonify',
-                          applicationVersion: '1.0.0',
-                          applicationIcon: Icon(
-                            Icons.record_voice_over,
-                            color: isDarkMode ? darkAccentColor : lightPrimaryColor,
-                            size: 36,
+                          applicationName: AppConstants.appName,
+                          applicationVersion: AppConstants.appVersion,
+                          applicationLegalese: '© 2026 Khalid',
+                          applicationIcon: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              'assets/images/sonify-logo.png',
+                              width: 48,
+                              height: 48,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.record_voice_over,
+                                color: isDarkMode ? darkAccentColor : lightPrimaryColor,
+                                size: 36,
+                              ),
+                            ),
                           ),
                           children: [
-                            const Text(
-                              'Sonify is a text-to-speech application that uses a local AI model to generate high-quality speech from text.',
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.settingsAboutDescription,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              l10n.settingsAboutTechInfo,
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                           ],
                         );
@@ -260,4 +368,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-}
+}

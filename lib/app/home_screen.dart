@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sonify/features/saved_audios/presentation/screens/saved_audios_screen.dart';
 import 'package:sonify/features/settings/presentation/screens/settings_screen.dart';
-import 'package:sonify/features/text_to_speech/presentaiont/screens/text_to_speech_screen.dart';
+import 'package:sonify/features/text_to_speech/presentation/screens/text_to_speech_screen.dart';
+import 'package:sonify/l10n/app_localizations.dart';
 
 import '../features/theme/presentation/providers/theme_provider.dart';
 import '../core/widgets/theme_switch_widget.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -28,16 +29,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Sonify',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          l10n.appTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           const ThemeSwitchWidget(),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
         ],
       ),
       body: SafeArea(
@@ -53,18 +55,18 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
         selectedItemColor: isDarkMode ? theme.colorScheme.secondary : theme.colorScheme.primary,
         unselectedItemColor: isDarkMode ? const Color(0xFF8E8E8E) : Colors.grey,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.record_voice_over),
-            label: 'Text to Speech',
+            icon: const Icon(Icons.record_voice_over),
+            label: l10n.navTextToSpeech,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.library_music),
-            label: 'Saved Audio',
+            icon: const Icon(Icons.library_music),
+            label: l10n.navSavedAudio,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: const Icon(Icons.settings),
+            label: l10n.navSettings,
           ),
         ],
       ),
