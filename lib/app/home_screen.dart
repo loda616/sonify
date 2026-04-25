@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sonify/features/saved_audios/presentation/screens/saved_audios_screen.dart';
 import 'package:sonify/features/settings/presentation/screens/settings_screen.dart';
 import 'package:sonify/features/text_to_speech/presentation/screens/text_to_speech_screen.dart';
 import 'package:sonify/l10n/app_localizations.dart';
 
-import '../features/theme/presentation/providers/theme_provider.dart';
 import '../core/widgets/theme_switch_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,9 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -52,9 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
             _selectedIndex = index;
           });
         },
-        backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-        selectedItemColor: isDarkMode ? theme.colorScheme.secondary : theme.colorScheme.primary,
-        unselectedItemColor: isDarkMode ? const Color(0xFF8E8E8E) : Colors.grey,
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.record_voice_over),

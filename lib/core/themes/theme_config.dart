@@ -67,6 +67,11 @@ ThemeData getLightTheme() {
         borderSide: const BorderSide(color: lightAccentColor, width: 2),
       ),
     ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.white,
+      selectedItemColor: lightPrimaryColor,
+      unselectedItemColor: Colors.grey,
+    ),
   );
 }
 
@@ -126,6 +131,11 @@ ThemeData getDarkTheme() {
         borderSide: const BorderSide(color: darkAccentColor, width: 2),
       ),
       hintStyle: const TextStyle(color: Color(0xFF8E8E8E)),
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Color(0xFF1E1E1E),
+      selectedItemColor: darkAccentColor,
+      unselectedItemColor: Color(0xFF8E8E8E),
     ),
   );
 }
