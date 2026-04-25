@@ -30,7 +30,11 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
   String _searchQuery = '';
   bool _sortAlphabetical = false;
 
-  List<AudioFile> get _filteredAudios {
+  // ⚡ Bolt Optimization: Cache filtered and sorted list to prevent
+  // O(N log N) sorting and O(N) string manipulation on every build/re-render.
+  List<AudioFile> _cachedFilteredAudios = [];
+
+  void _updateFilteredAudios() {
     var list =
         _audioFiles
             .where(
@@ -42,7 +46,7 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
         (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
       );
     }
-    return list;
+    _cachedFilteredAudios = list;
   }
 
   @override
@@ -73,6 +77,7 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
       if (mounted) {
         setState(() {
           _audioFiles = files;
+          _updateFilteredAudios();
         });
       }
     } catch (e) {
@@ -150,9 +155,8 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
 
     controller.dispose();
 
-    if (newTitle == null || newTitle.isEmpty || newTitle == audioFile.title) {
+    if (newTitle == null || newTitle.isEmpty || newTitle == audioFile.title)
       return;
-    }
 
     final success = await _ttsService.renameAudio(audioFile.id, newTitle);
     if (success) {
@@ -168,6 +172,7 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
           if (_selectedAudio?.id == audioFile.id) {
             _selectedAudio = _audioFiles[index];
           }
+          _updateFilteredAudios();
         }
       });
       scaffoldMessenger.showSnackBar(
@@ -211,6 +216,7 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
             if (_selectedAudio?.id == audioFile.id) {
               _selectedAudio = null;
             }
+            _updateFilteredAudios();
           });
           scaffoldMessenger.showSnackBar(
             SnackBar(content: Text(l10n.savedDeleted)),
@@ -233,7 +239,7 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
     final isDarkMode = context.select<ThemeProvider, bool>((p) => p.isDarkMode);
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final displayList = _filteredAudios;
+    final displayList = _cachedFilteredAudios;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -259,9 +265,10 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                               ? l10n.savedSortByDate
                               : l10n.savedSortByName,
                       onPressed:
-                          () => setState(
-                            () => _sortAlphabetical = !_sortAlphabetical,
-                          ),
+                          () => setState(() {
+                            _sortAlphabetical = !_sortAlphabetical;
+                            _updateFilteredAudios();
+                          }),
                     ),
                   IconButton(
                     icon: const Icon(Icons.refresh),
@@ -287,7 +294,10 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                           icon: const Icon(Icons.clear, size: 20),
                           onPressed: () {
                             _searchController.clear();
-                            setState(() => _searchQuery = '');
+                            setState(() {
+                              _searchQuery = '';
+                              _updateFilteredAudios();
+                            });
                           },
                         )
                         : null,
@@ -300,7 +310,11 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                   ),
                 ),
               ),
-              onChanged: (v) => setState(() => _searchQuery = v),
+              onChanged:
+                  (v) => setState(() {
+                    _searchQuery = v;
+                    _updateFilteredAudios();
+                  }),
             ),
           ],
 
