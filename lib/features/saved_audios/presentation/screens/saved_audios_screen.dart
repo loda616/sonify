@@ -12,7 +12,6 @@ import '../../../../core/di/service_locator.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../text_to_speech/presentation/widgets/audio_player_widget.dart';
 
-
 class SavedAudiosScreen extends StatefulWidget {
   const SavedAudiosScreen({super.key});
 
@@ -32,11 +31,16 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
   bool _sortAlphabetical = false;
 
   List<AudioFile> get _filteredAudios {
-    var list = _audioFiles.where((f) =>
-      f.title.toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
+    var list =
+        _audioFiles
+            .where(
+              (f) => f.title.toLowerCase().contains(_searchQuery.toLowerCase()),
+            )
+            .toList();
     if (_sortAlphabetical) {
-      list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+      list.sort(
+        (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+      );
     }
     return list;
   }
@@ -45,7 +49,10 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
   void initState() {
     super.initState();
     _ttsService = sl<TTSService>();
-    _loadAudioFiles();
+    // Load after first frame to prevent blocking initial render
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAudioFiles();
+    });
   }
 
   @override
@@ -118,30 +125,34 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
 
     final newTitle = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.savedRenameTitle),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(hintText: l10n.savedRenameHint),
-          onSubmitted: (value) => Navigator.of(context).pop(value.trim()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.genericCancel),
+      builder:
+          (context) => AlertDialog(
+            title: Text(l10n.savedRenameTitle),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: InputDecoration(hintText: l10n.savedRenameHint),
+              onSubmitted: (value) => Navigator.of(context).pop(value.trim()),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.genericCancel),
+              ),
+              TextButton(
+                onPressed:
+                    () => Navigator.of(context).pop(controller.text.trim()),
+                child: Text(l10n.genericSave),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-            child: Text(l10n.genericSave),
-          ),
-        ],
-      ),
     );
 
     controller.dispose();
 
-    if (newTitle == null || newTitle.isEmpty || newTitle == audioFile.title) return;
+    if (newTitle == null || newTitle.isEmpty || newTitle == audioFile.title) {
+      return;
+    }
 
     final success = await _ttsService.renameAudio(audioFile.id, newTitle);
     if (success) {
@@ -174,20 +185,21 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.savedDeleteConfirmTitle),
-        content: Text(l10n.savedDeleteConfirmMessage(audioFile.title)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.genericCancel),
+      builder:
+          (context) => AlertDialog(
+            title: Text(l10n.savedDeleteConfirmTitle),
+            content: Text(l10n.savedDeleteConfirmMessage(audioFile.title)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l10n.genericCancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(l10n.genericDelete),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.genericDelete),
-          ),
-        ],
-      ),
     );
 
     if (confirmed ?? false) {
@@ -218,7 +230,7 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final isDarkMode = context.select<ThemeProvider, bool>((p) => p.isDarkMode);
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final displayList = _filteredAudios;
@@ -231,18 +243,25 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.savedTitle,
-                style: theme.textTheme.titleLarge,
-              ),
+              Text(l10n.savedTitle, style: theme.textTheme.titleLarge),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (!_isLoading && _audioFiles.isNotEmpty)
                     IconButton(
-                      icon: Icon(_sortAlphabetical ? Icons.sort_by_alpha : Icons.access_time),
-                      tooltip: _sortAlphabetical ? l10n.savedSortByDate : l10n.savedSortByName,
-                      onPressed: () => setState(() => _sortAlphabetical = !_sortAlphabetical),
+                      icon: Icon(
+                        _sortAlphabetical
+                            ? Icons.sort_by_alpha
+                            : Icons.access_time,
+                      ),
+                      tooltip:
+                          _sortAlphabetical
+                              ? l10n.savedSortByDate
+                              : l10n.savedSortByName,
+                      onPressed:
+                          () => setState(
+                            () => _sortAlphabetical = !_sortAlphabetical,
+                          ),
                     ),
                   IconButton(
                     icon: const Icon(Icons.refresh),
@@ -262,20 +281,23 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
               decoration: InputDecoration(
                 hintText: l10n.savedSearchHint,
                 prefixIcon: const Icon(Icons.search, size: 20),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, size: 20),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
+                suffixIcon:
+                    _searchQuery.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.clear, size: 20),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                        : null,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!),
+                  borderSide: BorderSide(
+                    color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                  ),
                 ),
               ),
               onChanged: (v) => setState(() => _searchQuery = v),
@@ -288,18 +310,20 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
             Expanded(
               child: Shimmer.fromColors(
                 baseColor: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
-                highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+                highlightColor:
+                    isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
                 child: ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: 5,
-                  itemBuilder: (_, __) => Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  itemBuilder:
+                      (_, __) => Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                 ),
               ),
             )
@@ -350,16 +374,23 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                           margin: const EdgeInsets.only(bottom: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: isSelected
-                                ? BorderSide(
-                              color: isDarkMode ? darkAccentColor : lightAccentColor,
-                              width: 2,
-                            )
-                                : BorderSide.none,
+                            side:
+                                isSelected
+                                    ? BorderSide(
+                                      color:
+                                          isDarkMode
+                                              ? darkAccentColor
+                                              : lightAccentColor,
+                                      width: 2,
+                                    )
+                                    : BorderSide.none,
                           ),
-                          color: isSelected
-                              ? (isDarkMode ? const Color(0xFF252525) : const Color(0xFFF0F0F0))
-                              : null,
+                          color:
+                              isSelected
+                                  ? (isDarkMode
+                                      ? const Color(0xFF252525)
+                                      : const Color(0xFFF0F0F0))
+                                  : null,
                           child: ListTile(
                             title: Text(
                               audioFile.title,
@@ -370,7 +401,10 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                               style: theme.textTheme.bodySmall,
                             ),
                             leading: CircleAvatar(
-                              backgroundColor: isDarkMode ? darkPrimaryColor : lightPrimaryColor,
+                              backgroundColor:
+                                  isDarkMode
+                                      ? darkPrimaryColor
+                                      : lightPrimaryColor,
                               child: const Icon(
                                 Icons.music_note,
                                 color: Colors.white,
@@ -394,18 +428,24 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                             onLongPress: () => _copyToClipboard(audioFile),
                             onTap: () async {
                               if (!isSelected) {
-                                final scaffoldMessenger = ScaffoldMessenger.of(context);
-                                final exists = await File(audioFile.filePath).exists();
+                                final scaffoldMessenger = ScaffoldMessenger.of(
+                                  context,
+                                );
+                                final exists =
+                                    await File(audioFile.filePath).exists();
                                 if (!exists) {
                                   scaffoldMessenger.showSnackBar(
-                                    SnackBar(content: Text(l10n.savedFileNotFound)),
+                                    SnackBar(
+                                      content: Text(l10n.savedFileNotFound),
+                                    ),
                                   );
                                   return;
                                 }
                               }
                               if (mounted) {
                                 setState(() {
-                                  _selectedAudio = isSelected ? null : audioFile;
+                                  _selectedAudio =
+                                      isSelected ? null : audioFile;
                                 });
                               }
                             },
@@ -420,7 +460,8 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+                        color:
+                            isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -445,29 +486,41 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
                               IconButton(
                                 icon: Icon(
                                   Icons.edit_rounded,
-                                  color: isDarkMode ? darkAccentColor : lightAccentColor,
+                                  color:
+                                      isDarkMode
+                                          ? darkAccentColor
+                                          : lightAccentColor,
                                   size: 20,
                                 ),
                                 tooltip: l10n.savedRename,
-                                onPressed: () => _renameAudioFile(_selectedAudio!),
+                                onPressed:
+                                    () => _renameAudioFile(_selectedAudio!),
                               ),
                               IconButton(
                                 icon: Icon(
                                   Icons.copy_rounded,
-                                  color: isDarkMode ? darkAccentColor : lightAccentColor,
+                                  color:
+                                      isDarkMode
+                                          ? darkAccentColor
+                                          : lightAccentColor,
                                   size: 20,
                                 ),
                                 tooltip: l10n.savedCopied,
-                                onPressed: () => _copyToClipboard(_selectedAudio!),
+                                onPressed:
+                                    () => _copyToClipboard(_selectedAudio!),
                               ),
                               IconButton(
                                 icon: Icon(
                                   Icons.share_rounded,
-                                  color: isDarkMode ? darkAccentColor : lightAccentColor,
+                                  color:
+                                      isDarkMode
+                                          ? darkAccentColor
+                                          : lightAccentColor,
                                   size: 20,
                                 ),
                                 tooltip: l10n.savedShare,
-                                onPressed: () => _shareAudioFile(_selectedAudio!),
+                                onPressed:
+                                    () => _shareAudioFile(_selectedAudio!),
                               ),
                             ],
                           ),

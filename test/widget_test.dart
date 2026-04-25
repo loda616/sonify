@@ -1,30 +1,53 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:provider/provider.dart';
 import 'package:sonify/main.dart';
+import 'package:sonify/features/theme/presentation/providers/theme_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('App renders splash screen on startup', (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
+        child: const MyApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the splash screen or app title is present.
+    expect(find.text('Sonify'), findsWidgets);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('Theme toggle works correctly', (WidgetTester tester) async {
+    final themeProvider = ThemeProvider();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [ChangeNotifierProvider.value(value: themeProvider)],
+        child: MaterialApp(
+          home: Scaffold(
+            body: Consumer<ThemeProvider>(
+              builder: (context, provider, child) {
+                return Text(provider.isDarkMode ? 'Dark' : 'Light');
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Verify initial state
+    expect(find.text('Light'), findsOneWidget);
+    expect(find.text('Dark'), findsNothing);
+
+    // Toggle theme
+    themeProvider.toggleTheme();
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify toggled state
+    expect(find.text('Dark'), findsOneWidget);
+    expect(find.text('Light'), findsNothing);
   });
 }

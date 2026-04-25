@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dart analyze:*)",
+      "Bash(flutter pub:*)",
+      "Bash(grep -r \"DownloadTask\\\\|FileDownloader\\\\|TaskStatus\" C:/My_Projects/sonify --include=*.dart -A 2 -B 2)",
+      "Bash(dart pub:*)",
+      "Bash(flutter gen-l10n:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter build:*)"
+    ]
+  }
+}
