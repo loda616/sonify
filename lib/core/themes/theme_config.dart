@@ -21,14 +21,8 @@ ThemeData getLightTheme() {
       secondary: lightAccentColor,
     ),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(
-        color: lightTextColor,
-        fontFamily: 'Inter',
-      ),
-      bodyMedium: TextStyle(
-        color: lightTextColor,
-        fontFamily: 'Inter',
-      ),
+      bodyLarge: TextStyle(color: lightTextColor, fontFamily: 'Inter'),
+      bodyMedium: TextStyle(color: lightTextColor, fontFamily: 'Inter'),
       titleLarge: TextStyle(
         color: lightTextColor,
         fontFamily: 'Inter',
@@ -49,17 +43,13 @@ ThemeData getLightTheme() {
           fontWeight: FontWeight.bold,
         ),
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -87,18 +77,11 @@ ThemeData getDarkTheme() {
     colorScheme: const ColorScheme.dark(
       primary: darkPrimaryColor,
       secondary: darkAccentColor,
-      background: darkBackgroundColor,
       surface: Color(0xFF1E1E1E),
     ),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(
-        color: darkTextColor,
-        fontFamily: 'Manrope',
-      ),
-      bodyMedium: TextStyle(
-        color: darkTextColor,
-        fontFamily: 'Manrope',
-      ),
+      bodyLarge: TextStyle(color: darkTextColor, fontFamily: 'Manrope'),
+      bodyMedium: TextStyle(color: darkTextColor, fontFamily: 'Manrope'),
       titleLarge: TextStyle(
         color: darkTextColor,
         fontFamily: 'Manrope',
@@ -119,17 +102,13 @@ ThemeData getDarkTheme() {
           fontWeight: FontWeight.bold,
         ),
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFF1E1E1E),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
