@@ -53,7 +53,10 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
   void initState() {
     super.initState();
     _ttsService = sl<TTSService>();
-    _loadAudioFiles();
+    // Load after first frame to prevent blocking initial render
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAudioFiles();
+    });
   }
 
   @override
@@ -233,7 +236,7 @@ class _SavedAudiosScreenState extends State<SavedAudiosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final isDarkMode = context.select<ThemeProvider, bool>((p) => p.isDarkMode);
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final displayList = _cachedFilteredAudios;

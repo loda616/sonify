@@ -1,0 +1,218 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Sonify",
+
+  "navTextToSpeech": "Text to Speech",
+  "navSavedAudio": "Saved Audio",
+  "navSettings": "Settings",
+
+  "splashLoading": "Loading...",
+  "splashPreparing": "Preparing voice model...",
+  "splashReady": "Ready!",
+  "splashFailed": "Failed to load. Tap to retry.",
+
+  "ttsTitle": "Convert Text to Speech",
+  "ttsHint": "Enter text to convert to speech...",
+  "ttsVoiceLabel": "Voice",
+  "ttsPreviewTooltip": "Preview voice",
+  "ttsPreviewDefault": "Hello, this is how I sound.",
+  "ttsSpeedLabel": "Speed:",
+  "ttsGenerating": "Generating...",
+  "ttsGeneratingLong": "Generating... this may take a few seconds",
+  "ttsGenerateButton": "Generate Speech",
+  "ttsVoiceLoadError": "Could not load voices for this model.",
+  "ttsEmptyTextError": "Please enter some text",
+  "ttsTextTooLong": "Text is too long (max {maxLength} characters)",
+  "@ttsTextTooLong": {
+    "placeholders": {
+      "maxLength": {"type": "int"}
+    }
+  },
+  "ttsEngineError": "Voice engine failed to load. Try restarting the app.",
+  "ttsGenerationError": "Could not generate speech. Try shorter text.",
+  "ttsPreviewFailed": "Preview failed",
+  "ttsAudioSaved": "Audio saved successfully",
+  "ttsAudioSaveFailed": "Failed to save audio",
+
+  "ttsHistory": "History",
+  "ttsHistoryTitle": "Recent Texts",
+  "ttsHistoryEmpty": "No recent texts yet",
+  "ttsHistoryDeleteItem": "Remove from history",
+
+  "ttsBatchGenerate": "Generate {count} Parts",
+  "@ttsBatchGenerate": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "ttsBatchProgress": "Generating part {current} of {total}...",
+  "@ttsBatchProgress": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "ttsBatchComplete": "All {count} parts saved!",
+  "@ttsBatchComplete": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "ttsWordCount": "{count} words ~ {duration}",
+  "@ttsWordCount": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "duration": {"type": "String"}
+    }
+  },
+
+  "playerSave": "Save",
+
+  "savedTitle": "Saved Audio Files",
+  "savedRefresh": "Refresh",
+  "savedEmpty": "No saved audio files yet",
+  "savedEmptyHint": "Convert text to speech and save audio files to see them here",
+  "savedDeleteConfirmTitle": "Confirm Delete",
+  "savedDeleteConfirmMessage": "Are you sure you want to delete \"{title}\"?",
+  "@savedDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "savedDeleted": "Audio deleted successfully",
+  "savedDeleteFailed": "Failed to delete audio",
+  "savedLoadError": "Error loading audio files",
+  "savedDeleteError": "Error deleting audio",
+  "savedFileNotFound": "Audio file no longer available",
+  "savedShare": "Share",
+  "savedShareFailed": "Failed to share audio",
+  "savedCopied": "Text copied to clipboard",
+  "savedSearchHint": "Search saved audio...",
+  "savedSortByDate": "Sort by date",
+  "savedSortByName": "Sort by name",
+  "savedRename": "Rename",
+  "savedRenameTitle": "Rename Audio",
+  "savedRenameHint": "Enter new name",
+  "savedRenamed": "Audio renamed",
+  "savedRenameFailed": "Failed to rename audio",
+
+  "settingsTitle": "Settings",
+  "settingsAppearance": "Appearance",
+  "settingsDarkMode": "Dark Mode",
+  "settingsDarkTheme": "Using dark theme",
+  "settingsLightTheme": "Using light theme",
+  "settingsVoice": "Voice Settings",
+  "settingsDefaultSpeed": "Default Speed",
+  "settingsTtsEngine": "TTS Engine",
+  "settingsDiscoverVoices": "Select Voice",
+  "settingsDiscoverVoicesDesc": "Choose from built-in Arabic & English voices",
+  "settingsStorage": "Storage",
+  "settingsClearAll": "Clear All Saved Audio",
+  "settingsClearAllDesc": "Delete all saved audio files",
+  "settingsClearConfirmTitle": "Confirm Deletion",
+  "settingsClearConfirmMessage": "Are you sure you want to delete all saved audio files? This action cannot be undone.",
+  "settingsClearSuccess": "All audio files have been deleted",
+  "settingsExportAll": "Export All Audio Files",
+  "settingsExportAllDesc": "Export all audio files to device storage",
+  "settingsExportSuccess": "Audio files exported to: {path}",
+  "@settingsExportSuccess": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "settingsAbout": "About",
+  "settingsAboutDescription": "Sonify transforms text into natural-sounding speech using Piper AI, powered by sherpa-onnx. Fully offline — no internet required.",
+  "settingsAboutTechInfo": "Voice Model: Piper Lessac (English)\nEngine: sherpa-onnx\nLicense: Apache 2.0 / MIT",
+
+  "modelManagerTitle": "Manage Voices",
+  "modelDownloaded": "{name} downloaded successfully!",
+  "@modelDownloaded": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "modelActivated": "{name} activated!",
+  "@modelActivated": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "modelDeleteTitle": "Delete Voice",
+  "modelDeleteConfirm": "Are you sure you want to delete {name}? This frees up storage space.",
+  "@modelDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "modelDeleted": "Voice deleted.",
+  "modelDeleteFailed": "Failed to delete voice. Please try again.",
+  "modelActivateFailed": "Failed to activate voice. Please try again.",
+  "modelCannotDeleteDefault": "Cannot delete the default bundled model.",
+  "modelQuality": "Quality: {quality}",
+  "@modelQuality": {
+    "placeholders": {
+      "quality": {"type": "String"}
+    }
+  },
+  "modelInstalling": "Installing voice...",
+  "modelDownloading": "Downloading... {percent}%",
+  "@modelDownloading": {
+    "placeholders": {
+      "percent": {"type": "String"}
+    }
+  },
+  "modelActive": "Active",
+  "modelBundled": "Bundled",
+  "modelCancelDownload": "Cancel download",
+  "modelDeleteVoice": "Delete voice",
+  "modelDownloadVoice": "Download voice",
+  "modelAnotherInProgress": "Another download in progress",
+  "modelDownloadCancelled": "Download cancelled.",
+
+  "modelInfoTitle": "About Voice Models",
+  "modelInfoDescription": "Sonify uses Piper TTS — free, open-source voices that work 100% offline. All models are from the sherpa-onnx project.",
+  "modelBrowseAll": "Browse All Voices",
+  "modelImportCustom": "Import Custom Model",
+  "modelImportTitle": "Import Voice Model",
+  "modelImportUrlLabel": "Model URL (.tar.bz2)",
+  "modelImportUrlHint": "https://github.com/.../model.tar.bz2",
+  "modelImportNameLabel": "Model Name",
+  "modelImportNameHint": "e.g. My Custom Voice",
+  "modelImportLanguageLabel": "Language",
+  "modelImportLanguageHint": "e.g. English",
+  "modelImportInvalid": "Please provide a valid .tar.bz2 URL",
+  "modelImportNameRequired": "Please enter a model name",
+  "modelStorageSize": "{size} MB",
+  "@modelStorageSize": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "modelStorageTotal": "{count} voices · {size} MB total",
+  "@modelStorageTotal": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "size": {"type": "String"}
+    }
+  },
+  "modelImportSuccess": "Custom model added! Tap to download.",
+  "modelCustomRemoved": "Custom model removed.",
+  "modelSwipeDelete": "Swipe to delete",
+  "modelInstallFailed": "Failed to install voice. Please try again.",
+  "modelInstallCorrupted": "Installation failed — model files are missing or corrupted. Please try again.",
+  "modelImportUrlUnreachable": "Could not reach the URL. Check the link and your connection.",
+
+  "genericCancel": "Cancel",
+  "genericDelete": "Delete",
+  "genericDeleteAll": "Delete All",
+  "genericSave": "Save",
+  "genericError": "Something went wrong. Please try again.",
+  "genericErrorPrefix": "Error: {message}",
+  "@genericErrorPrefix": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  }
+}

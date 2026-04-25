@@ -18,6 +18,7 @@ class TTSService extends ChangeNotifier {
   RemoteModel get activeModel => _activeModel;
 
   final Completer<void> _initCompleter = Completer<void>();
+
   /// Completes when the persisted default model has been loaded.
   Future<void> get initialized => _initCompleter.future;
 
@@ -59,10 +60,7 @@ class TTSService extends ChangeNotifier {
     _pendingModelSwitch = completer.future;
 
     try {
-      // The only bundled model is the default one
-      final isBundled = model.directoryName == TtsEngine.defaultModelDir;
-
-      await engine.setModel(model.directoryName, isBundled: isBundled);
+      await engine.setModel(model.directoryName, isBundled: model.isBundled);
 
       _activeModel = model;
       final prefs = await SharedPreferences.getInstance();
