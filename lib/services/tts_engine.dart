@@ -317,9 +317,17 @@ class TtsEngine {
     int copiedCount = 0;
     int skippedCount = 0;
 
-    // Copy shared espeak-ng-data if not already present
+    // Copy shared espeak-ng-data if not already present OR if incomplete.
+    // Check for the 'lang' subdirectory as a completeness indicator — older
+    // installs may have the root dir but be missing lang/ (which contains the
+    // voice definitions that eSpeak-ng needs to set its voice).
     final sharedEspeakDir = Directory(p.join(appDir.path, 'espeak-ng-data'));
-    if (!await sharedEspeakDir.exists()) {
+    final sharedEspeakLangDir = Directory(
+      p.join(appDir.path, 'espeak-ng-data', 'lang'),
+    );
+    if (!await sharedEspeakDir.exists() ||
+        !await sharedEspeakLangDir.exists()) {
+      debugPrint('Copying shared espeak-ng-data (missing or incomplete)...');
       await _copySharedEspeakData(appDir.path);
     }
 

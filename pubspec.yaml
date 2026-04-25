@@ -50,7 +50,48 @@ flutter:
 
   assets:
     - assets/images/
+
+    # eSpeak-ng data (shared by all models)
+    # Flutter does NOT recurse into subdirectories — every subdir must be listed!
     - assets/espeak-ng-data/
+    - assets/espeak-ng-data/lang/
+    - assets/espeak-ng-data/lang/aav/
+    - assets/espeak-ng-data/lang/art/
+    - assets/espeak-ng-data/lang/azc/
+    - assets/espeak-ng-data/lang/bat/
+    - assets/espeak-ng-data/lang/bnt/
+    - assets/espeak-ng-data/lang/ccs/
+    - assets/espeak-ng-data/lang/cel/
+    - assets/espeak-ng-data/lang/cus/
+    - assets/espeak-ng-data/lang/dra/
+    - assets/espeak-ng-data/lang/esx/
+    - assets/espeak-ng-data/lang/gmq/
+    - assets/espeak-ng-data/lang/gmw/
+    - assets/espeak-ng-data/lang/grk/
+    - assets/espeak-ng-data/lang/inc/
+    - assets/espeak-ng-data/lang/ine/
+    - assets/espeak-ng-data/lang/ira/
+    - assets/espeak-ng-data/lang/iro/
+    - assets/espeak-ng-data/lang/itc/
+    - assets/espeak-ng-data/lang/jpx/
+    - assets/espeak-ng-data/lang/map/
+    - assets/espeak-ng-data/lang/miz/
+    - assets/espeak-ng-data/lang/myn/
+    - assets/espeak-ng-data/lang/poz/
+    - assets/espeak-ng-data/lang/roa/
+    - assets/espeak-ng-data/lang/sai/
+    - assets/espeak-ng-data/lang/sem/
+    - assets/espeak-ng-data/lang/sit/
+    - assets/espeak-ng-data/lang/tai/
+    - assets/espeak-ng-data/lang/trk/
+    - assets/espeak-ng-data/lang/urj/
+    - assets/espeak-ng-data/lang/zle/
+    - assets/espeak-ng-data/lang/zls/
+    - assets/espeak-ng-data/lang/zlw/
+    - assets/espeak-ng-data/voices/
+    - assets/espeak-ng-data/voices/!v/
+
+    # TTS model files
     - assets/tts-model/vits-piper-en_US-lessac-medium/
     - assets/tts-model/vits-piper-ar_JO-kareem-medium/
     - assets/tts-model/vits-piper-en_US-ryan-medium/
