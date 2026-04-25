@@ -1,4 +1,4 @@
-package com.example.sonify
+package com.sonifyapp.sonify
 
 import io.flutter.embedding.android.FlutterActivity
 import android.os.Bundle
