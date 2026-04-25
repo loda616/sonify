@@ -102,6 +102,63 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
+  Widget _buildLogo() {
+    return Container(
+      width: 180,
+      height: 180,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(36),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 24,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(36),
+        child: Image.asset(
+          'assets/images/sonify-logo.png',
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressOrError() {
+    if (!_hasError) {
+      return SizedBox(
+        width: 140,
+        child: LinearProgressIndicator(
+          backgroundColor: Colors.white.withValues(alpha: 0.15),
+          valueColor: const AlwaysStoppedAnimation<Color>(
+            Color(0xFF00D8FF),
+          ),
+          minHeight: 4,
+          borderRadius: BorderRadius.circular(2),
+        ),
+      );
+    } else {
+      return const Icon(
+        Icons.refresh,
+        color: Colors.white70,
+        size: 32,
+      );
+    }
+  }
+
+  Widget _buildStatusText(BuildContext context) {
+    return Text(
+      _resolveStatusText(context),
+      style: const TextStyle(
+        color: Colors.white70,
+        fontSize: 14,
+        letterSpacing: 0.3,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color bgColor = Color(0xFF1A3684);
@@ -127,62 +184,11 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo
-                      Container(
-                        width: 180,
-                        height: 180,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(36),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 24,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(36),
-                          child: Image.asset(
-                            'assets/images/sonify-logo.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
+                      _buildLogo(),
                       const SizedBox(height: 48),
-
-                      // Progress or error icon
-                      if (!_hasError)
-                        SizedBox(
-                          width: 140,
-                          child: LinearProgressIndicator(
-                            backgroundColor: Colors.white.withValues(alpha: 0.15),
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFF00D8FF),
-                            ),
-                            minHeight: 4,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        )
-                      else
-                        const Icon(
-                          Icons.refresh,
-                          color: Colors.white70,
-                          size: 32,
-                        ),
-
+                      _buildProgressOrError(),
                       const SizedBox(height: 24),
-
-                      // Status text
-                      Text(
-                        _resolveStatusText(context),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
+                      _buildStatusText(context),
                     ],
                   ),
                 ),
