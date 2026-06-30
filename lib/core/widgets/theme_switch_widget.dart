@@ -5,7 +5,7 @@ import 'package:sonify/features/theme/presentation/providers/theme_provider.dart
 import 'package:sonify/core/themes/theme_config.dart';
 
 class ThemeSwitchWidget extends StatelessWidget {
-  const ThemeSwitchWidget({Key? key}) : super(key: key);
+  const ThemeSwitchWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,17 +25,18 @@ class ThemeSwitchWidget extends StatelessWidget {
         ),
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          child: isDarkMode
-              ? Icon(
-            Icons.light_mode,
-            key: const ValueKey('light'),
-            color: darkAccentColor,
-          )
-              : Icon(
-            Icons.dark_mode,
-            key: const ValueKey('dark'),
-            color: lightPrimaryColor,
-          ),
+          child:
+              isDarkMode
+                  ? Icon(
+                    Icons.light_mode,
+                    key: const ValueKey('light'),
+                    color: darkAccentColor,
+                  )
+                  : Icon(
+                    Icons.dark_mode,
+                    key: const ValueKey('dark'),
+                    color: lightPrimaryColor,
+                  ),
         ),
       ),
     );

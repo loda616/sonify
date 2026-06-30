@@ -1,0 +1,267 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Sonify",
+  "@appTitle": {
+    "description": "The application title"
+  },
+
+  "splashTagline": "Transform Text to Speech",
+  "@splashTagline": {
+    "description": "Tagline shown on the splash screen"
+  },
+
+  "homeTabTts": "Text to Speech",
+  "@homeTabTts": {
+    "description": "Bottom navigation tab label for Text to Speech"
+  },
+  "homeTabSaved": "Saved Audio",
+  "@homeTabSaved": {
+    "description": "Bottom navigation tab label for Saved Audio"
+  },
+  "homeTabSettings": "Settings",
+  "@homeTabSettings": {
+    "description": "Bottom navigation tab label for Settings"
+  },
+
+  "ttsTitle": "Convert Text to Speech",
+  "@ttsTitle": {
+    "description": "Title heading on the Text to Speech screen"
+  },
+  "ttsHintText": "Enter text to convert to speech...",
+  "@ttsHintText": {
+    "description": "Hint text in the text input field"
+  },
+  "ttsVoiceLabel": "Voice",
+  "@ttsVoiceLabel": {
+    "description": "Label for the voice selection dropdown"
+  },
+  "ttsPitchLabel": "Pitch:",
+  "@ttsPitchLabel": {
+    "description": "Label for the pitch slider"
+  },
+  "ttsSpeedLabel": "Speed:",
+  "@ttsSpeedLabel": {
+    "description": "Label for the speed slider"
+  },
+  "ttsGenerateBtn": "Generate Speech",
+  "@ttsGenerateBtn": {
+    "description": "Button text to generate speech"
+  },
+  "ttsGeneratingBtn": "Generating...",
+  "@ttsGeneratingBtn": {
+    "description": "Button text while speech is being generated"
+  },
+  "ttsEnterTextError": "Please enter some text",
+  "@ttsEnterTextError": {
+    "description": "Error shown when user tries to generate without entering text"
+  },
+  "ttsError": "Error generating speech: {error}",
+  "@ttsError": {
+    "description": "Error message shown when TTS generation fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ttsTitleTruncated": "Title truncated to 30 characters for saving",
+  "@ttsTitleTruncated": {
+    "description": "Notice shown when save title was truncated"
+  },
+  "ttsSaveSuccess": "Audio saved successfully",
+  "@ttsSaveSuccess": {
+    "description": "Success message after saving audio"
+  },
+  "ttsSaveFailed": "Failed to save audio",
+  "@ttsSaveFailed": {
+    "description": "Error message when saving audio fails"
+  },
+
+  "voiceDefault": "Default",
+  "@voiceDefault": {
+    "description": "Default voice option in the voice selector"
+  },
+
+  "audioSaveBtn": "Save",
+  "@audioSaveBtn": {
+    "description": "Button label to save the generated audio"
+  },
+
+  "savedTitle": "Saved Audio Files",
+  "@savedTitle": {
+    "description": "Title heading on the Saved Audio screen"
+  },
+  "savedRefreshTooltip": "Refresh",
+  "@savedRefreshTooltip": {
+    "description": "Tooltip for the refresh button"
+  },
+  "savedEmptyTitle": "No saved audio files yet",
+  "@savedEmptyTitle": {
+    "description": "Title shown when no saved audio files exist"
+  },
+  "savedEmptySubtitle": "Convert text to speech and save audio files to see them here",
+  "@savedEmptySubtitle": {
+    "description": "Subtitle shown when no saved audio files exist"
+  },
+  "savedCreatedPrefix": "Created: {date}",
+  "@savedCreatedPrefix": {
+    "description": "Prefix before the creation date of a saved audio file",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedDeleteConfirmTitle": "Confirm Delete",
+  "@savedDeleteConfirmTitle": {
+    "description": "Title of the delete confirmation dialog"
+  },
+  "savedDeleteConfirmContent": "Are you sure you want to delete \"{title}\"?",
+  "@savedDeleteConfirmContent": {
+    "description": "Content of the delete confirmation dialog",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "savedCancelBtn": "Cancel",
+  "@savedCancelBtn": {
+    "description": "Cancel button text"
+  },
+  "savedDeleteBtn": "Delete",
+  "@savedDeleteBtn": {
+    "description": "Delete button text"
+  },
+  "savedDeleteSuccess": "Audio deleted successfully",
+  "@savedDeleteSuccess": {
+    "description": "Success message after deleting audio"
+  },
+  "savedDeleteFailed": "Failed to delete audio",
+  "@savedDeleteFailed": {
+    "description": "Error message when deleting audio fails"
+  },
+  "savedLoadError": "Error loading audio files: {error}",
+  "@savedLoadError": {
+    "description": "Error message when loading saved audio files fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "savedDeleteError": "Error deleting audio: {error}",
+  "@savedDeleteError": {
+    "description": "Error message when deleting an audio file fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Title heading on the Settings screen"
+  },
+  "settingsAppearanceSection": "Appearance",
+  "@settingsAppearanceSection": {
+    "description": "Section title for appearance settings"
+  },
+  "settingsDarkModeLabel": "Dark Mode",
+  "@settingsDarkModeLabel": {
+    "description": "Label for the dark mode toggle"
+  },
+  "settingsDarkModeOn": "Using dark theme",
+  "@settingsDarkModeOn": {
+    "description": "Subtitle when dark mode is on"
+  },
+  "settingsDarkModeOff": "Using light theme",
+  "@settingsDarkModeOff": {
+    "description": "Subtitle when dark mode is off"
+  },
+  "settingsStorageSection": "Storage",
+  "@settingsStorageSection": {
+    "description": "Section title for storage settings"
+  },
+  "settingsClearAllTitle": "Clear All Saved Audio",
+  "@settingsClearAllTitle": {
+    "description": "Title for the clear all audio option"
+  },
+  "settingsClearAllSubtitle": "Delete all saved audio files",
+  "@settingsClearAllSubtitle": {
+    "description": "Subtitle for the clear all audio option"
+  },
+  "settingsClearConfirmTitle": "Confirm Deletion",
+  "@settingsClearConfirmTitle": {
+    "description": "Title of the clear all confirmation dialog"
+  },
+  "settingsClearConfirmContent": "Are you sure you want to delete all saved audio files? This action cannot be undone.",
+  "@settingsClearConfirmContent": {
+    "description": "Content of the clear all confirmation dialog"
+  },
+  "settingsClearCancelBtn": "Cancel",
+  "@settingsClearCancelBtn": {
+    "description": "Cancel button in the clear all dialog"
+  },
+  "settingsClearDeleteAllBtn": "Delete All",
+  "@settingsClearDeleteAllBtn": {
+    "description": "Confirm button in the clear all dialog"
+  },
+  "settingsClearSuccess": "All audio files have been deleted",
+  "@settingsClearSuccess": {
+    "description": "Success message after clearing all audio files"
+  },
+  "settingsExportTitle": "Export All Audio Files",
+  "@settingsExportTitle": {
+    "description": "Title for the export option"
+  },
+  "settingsExportSubtitle": "Export all audio files to device storage",
+  "@settingsExportSubtitle": {
+    "description": "Subtitle for the export option"
+  },
+  "settingsExportSuccess": "Audio files exported to: {path}",
+  "@settingsExportSuccess": {
+    "description": "Success message after exporting audio files",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsError": "Error: {error}",
+  "@settingsError": {
+    "description": "Generic error message format in settings",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAboutSection": "About",
+  "@settingsAboutSection": {
+    "description": "Section title for about information"
+  },
+  "settingsAboutAppName": "Sonify",
+  "@settingsAboutAppName": {
+    "description": "Application name in the About section"
+  },
+  "settingsAboutVersion": "Version {version}",
+  "@settingsAboutVersion": {
+    "description": "Version text shown in the About section",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAboutDescription": "Sonify is a text-to-speech application that uses a local AI model to generate high-quality speech from text.",
+  "@settingsAboutDescription": {
+    "description": "Description text in the About dialog"
+  },
+  "settingsLanguageLabel": "Language",
+  "@settingsLanguageLabel": {
+    "description": "Label for the language selection dropdown"
+  }
+}

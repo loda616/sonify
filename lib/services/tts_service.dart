@@ -1,12 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:sonify/core/models/audio_file.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 class TTSService {
@@ -14,8 +16,8 @@ class TTSService {
   static TTSService? _instance;
   final FlutterTts _flutterTts = FlutterTts();
   bool _isInitialized = false;
+  bool _isInitializing = false;
 
-  // Singleton pattern
   factory TTSService() {
     _instance ??= TTSService._internal();
     return _instance!;
@@ -25,53 +27,91 @@ class TTSService {
 
   Future<void> _initialize() async {
     if (_isInitialized) return;
+    if (_isInitializing) {
+      while (_isInitializing) {
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+      return;
+    }
+    _isInitializing = true;
 
     try {
-      // Set up TTS settings
-      await _flutterTts.setLanguage("en-US");
       await _flutterTts.setSpeechRate(1.0);
       await _flutterTts.setVolume(1.0);
       await _flutterTts.setPitch(1.0);
 
-      // Get available voices
-      final voices = await _flutterTts.getVoices;
-      debugPrint('Available voices: $voices');
+      try {
+        await _flutterTts.setLanguage("en-US");
+      } catch (_) {
+        try {
+          await _flutterTts.setLanguage("en");
+        } catch (_) {}
+      }
+
+      try {
+        final voices = await _flutterTts.getVoices;
+        debugPrint('Available voices: $voices');
+      } catch (e) {
+        debugPrint('Could not query voices: $e');
+      }
 
       _isInitialized = true;
       debugPrint('TTS service initialized successfully');
+      
+      // Clean up old temporary audio files asynchronously
+      cleanupTempFiles();
     } catch (e) {
       debugPrint('Failed to initialize TTS service: $e');
       rethrow;
+    } finally {
+      _isInitializing = false;
     }
   }
 
+  static const MethodChannel _captureChannel =
+      MethodChannel('com.example.sonify/tts_capture');
+
   Future<String> generateSpeech(
-      String text, {
-        String voice = 'Default',
-        double pitch = 1.0,
-        double speed = 1.0,
-      }) async {
+    String text, {
+    String voice = 'Default',
+    double pitch = 1.0,
+    double speed = 1.0,
+  }) async {
     await _initialize();
 
-    try {
-      // Create a temporary file to store the generated audio
-      final tempDir = await getTemporaryDirectory();
-      final tempFile = File(path.join(tempDir.path, '${const Uuid().v4()}.mp3'));
+    final Directory appDir;
+    if (Platform.isAndroid) {
+      appDir = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
+    } else {
+      appDir = await getApplicationDocumentsDirectory();
+    }
+    final outputDir = Directory(path.join(appDir.path, _audioDirectoryName));
+    if (!await outputDir.exists()) {
+      await outputDir.create(recursive: true);
+    }
+    final outputFile = File(
+      path.join(outputDir.path, '${const Uuid().v4()}.wav'),
+    );
 
-      // Set voice parameters
+    try {
       await _flutterTts.setPitch(pitch);
       await _flutterTts.setSpeechRate(speed);
 
-      // If not default, try to set the voice
+      try {
+        await _flutterTts.setLanguage("en-US");
+      } catch (_) {
+        try {
+          await _flutterTts.setLanguage("en");
+        } catch (_) {}
+      }
+
       if (voice != 'Default') {
         try {
-          // Get available voices
           final voices = await _flutterTts.getVoices;
           final selectedVoice = (voices as List<dynamic>).firstWhere(
-                (v) => v['name'].toString().contains(voice),
+                (v) => v['name'].toString() == voice,
             orElse: () => null,
           );
-
           if (selectedVoice != null) {
             await _flutterTts.setVoice({
               "name": selectedVoice['name'],
@@ -80,31 +120,126 @@ class TTSService {
           }
         } catch (e) {
           debugPrint('Error setting voice: $e');
-          // Continue with default voice
         }
       }
 
-      // Generate speech to file if platform supports it
       bool canSaveToFile = false;
       if (Platform.isAndroid || Platform.isIOS) {
         canSaveToFile = true;
       }
 
-      if (canSaveToFile) {
-        // On supported platforms, save directly to file
-        await _flutterTts.synthesizeToFile(text, tempFile.path);
-      } else {
-        // On other platforms, use the speak method and simulate file creation
-        // This is just a placeholder - the file won't actually contain audio data
-        await _flutterTts.speak(text);
-        await tempFile.create();
+      if (!canSaveToFile) {
+        throw UnsupportedError(
+          'Audio file generation is not supported on this platform.',
+        );
       }
 
-      return tempFile.path;
+      // Attempt 1: synthesizeToFile
+      for (int attempt = 0; attempt < 3; attempt++) {
+        try {
+          await _flutterTts.speak(" ");
+          await Future.delayed(const Duration(milliseconds: 200));
+        } catch (_) {}
+
+        final completer = Completer<void>();
+        _flutterTts.setCompletionHandler(() {
+          if (!completer.isCompleted) completer.complete();
+        });
+
+        await _flutterTts.synthesizeToFile(text, outputFile.path, true);
+        await completer.future.timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {},
+        );
+        await Future.delayed(const Duration(milliseconds: 200));
+
+        if (await outputFile.exists() && await outputFile.length() > 0) {
+          return outputFile.path;
+        }
+        debugPrint('synthesizeToFile attempt ${attempt + 1} failed, retrying...');
+      }
+
+      // Attempt 2: capture speaker output via MethodChannel
+      try {
+        debugPrint('Falling back to playback capture...');
+        await _flutterTts.stop();
+
+        final pcmFile = File(
+          path.join(outputDir.path, '${const Uuid().v4()}.pcm'),
+        );
+        await _captureChannel.invokeMethod('startCapture', {'path': pcmFile.path});
+
+        final speakCompleter = Completer<void>();
+        _flutterTts.setCompletionHandler(() {
+          if (!speakCompleter.isCompleted) speakCompleter.complete();
+        });
+
+        await _flutterTts.speak(text);
+
+        await speakCompleter.future.timeout(
+          const Duration(seconds: 30),
+          onTimeout: () {},
+        );
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        await _captureChannel.invokeMethod('stopCapture');
+
+        if (await pcmFile.exists() && await pcmFile.length() > 0) {
+          // Wrap raw PCM with WAV header
+          await _writeWavHeader(pcmFile, outputFile);
+          if (await outputFile.exists() && await outputFile.length() > 44) {
+            await pcmFile.delete();
+            return outputFile.path;
+          }
+        }
+      } catch (e) {
+        debugPrint('Playback capture failed: $e');
+      }
+
+      throw Exception('TTS engine did not produce audio output');
     } catch (e) {
       debugPrint('Error generating speech: $e');
       rethrow;
     }
+  }
+
+  Future<void> _writeWavHeader(File pcmFile, File wavFile) async {
+    final data = await pcmFile.readAsBytes();
+    final dataSize = data.length;
+    final fileSize = 36 + dataSize;
+
+    final header = ByteData(44);
+    header.setUint8(0, 0x52); // R
+    header.setUint8(1, 0x49); // I
+    header.setUint8(2, 0x46); // F
+    header.setUint8(3, 0x46); // F
+    header.setUint32(4, fileSize, Endian.little);
+    header.setUint8(8, 0x57);  // W
+    header.setUint8(9, 0x41);  // A
+    header.setUint8(10, 0x56); // V
+    header.setUint8(11, 0x45); // E
+    header.setUint8(12, 0x66); // f
+    header.setUint8(13, 0x6D); // m
+    header.setUint8(14, 0x74); // t
+    header.setUint8(15, 0x20); // (space)
+    header.setUint32(16, 16, Endian.little);   // subchunk1 size
+    header.setUint16(20, 1, Endian.little);    // PCM
+    header.setUint16(22, 1, Endian.little);    // mono
+    header.setUint32(24, 44100, Endian.little); // sample rate
+    header.setUint32(28, 88200, Endian.little); // byte rate
+    header.setUint16(32, 2, Endian.little);    // block align
+    header.setUint16(34, 16, Endian.little);   // bits per sample
+    header.setUint8(36, 0x64); // d
+    header.setUint8(37, 0x61); // a
+    header.setUint8(38, 0x74); // t
+    header.setUint8(39, 0x61); // a
+    header.setUint32(40, dataSize, Endian.little);
+
+    final wavData = Uint8List(44 + dataSize);
+    wavData.setRange(0, 44, header.buffer.asUint8List());
+    wavData.setRange(44, 44 + dataSize, data);
+
+    await wavFile.writeAsBytes(wavData);
   }
 
   Future<List<String>> getAvailableVoices() async {
@@ -156,7 +291,7 @@ class TTSService {
         'createdAt': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
       };
 
-      await metadataFile.writeAsString(metadata.toString());
+      await metadataFile.writeAsString(jsonEncode(metadata));
 
       return true;
     } catch (e) {
@@ -179,32 +314,20 @@ class TTSService {
 
       // Filter for json metadata files
       final metadataFiles = files.whereType<File>().where(
-            (file) => path.extension(file.path) == '.json',
+        (file) => path.extension(file.path) == '.json',
       );
 
       for (final file in metadataFiles) {
         try {
           final content = await file.readAsString();
-          // In a real app, use a proper JSON parser
-          final id = _extractValue(content, 'id');
-          final title = _extractValue(content, 'title');
-          final filePath = _extractValue(content, 'filePath');
-          final createdAt = _extractValue(content, 'createdAt');
-
-          final audioFile = File(filePath);
-          if (await audioFile.exists()) {
-            audioFiles.add(
-              AudioFile(
-                id: id,
-                title: title,
-                filePath: filePath,
-                createdAt: createdAt,
-              ),
-            );
+          final json = jsonDecode(content) as Map<String, dynamic>;
+          final audioFile = AudioFile.fromJson(json);
+          final audioFileOnDisk = File(audioFile.filePath);
+          if (await audioFileOnDisk.exists()) {
+            audioFiles.add(audioFile);
           }
         } catch (e) {
           debugPrint('Error parsing metadata file: $e');
-          // Continue to the next file
         }
       }
 
@@ -216,14 +339,6 @@ class TTSService {
       debugPrint('Error getting saved audios: $e');
       return [];
     }
-  }
-
-  // Simple helper to extract values from a stringified JSON
-  // In a real app, use a proper JSON parser
-  String _extractValue(String jsonString, String key) {
-    final regex = RegExp('$key: (.*?)(,|})', multiLine: true);
-    final match = regex.firstMatch(jsonString);
-    return match?.group(1)?.trim() ?? '';
   }
 
   Future<bool> deleteAudio(String id) async {
@@ -253,6 +368,31 @@ class TTSService {
       return false;
     }
   }
+
+  Future<bool> renameAudio(String id, String newTitle) async {
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final audioDir = Directory(path.join(appDir.path, _audioDirectoryName));
+
+      if (!await audioDir.exists()) {
+        return false;
+      }
+
+      final metadataFile = File(path.join(audioDir.path, '$id.json'));
+      if (await metadataFile.exists()) {
+        final content = await metadataFile.readAsString();
+        final json = jsonDecode(content) as Map<String, dynamic>;
+        json['title'] = newTitle;
+        await metadataFile.writeAsString(jsonEncode(json));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Error renaming audio: $e');
+      return false;
+    }
+  }
+
 
   Future<bool> clearAllSavedAudios() async {
     try {
@@ -295,7 +435,8 @@ class TTSService {
       for (final audioFile in audioFiles) {
         final sourceFile = File(audioFile.filePath);
         if (await sourceFile.exists()) {
-          final fileName = '${audioFile.title.replaceAll(' ', '_')}_${path.basename(audioFile.filePath)}';
+          final fileName =
+              '${audioFile.title.replaceAll(' ', '_')}_${path.basename(audioFile.filePath)}';
           final targetFile = File(path.join(exportDir.path, fileName));
           await sourceFile.copy(targetFile.path);
         }
@@ -327,7 +468,9 @@ class TTSService {
     } else if (Platform.isIOS) {
       // On iOS, we typically use the Documents directory
       final documentsDir = await getApplicationDocumentsDirectory();
-      final exportDir = Directory(path.join(documentsDir.path, 'Exports', dirName));
+      final exportDir = Directory(
+        path.join(documentsDir.path, 'Exports', dirName),
+      );
 
       if (!await exportDir.exists()) {
         await exportDir.create(recursive: true);
@@ -357,8 +500,86 @@ class TTSService {
     }
   }
 
+  Future<void> playPreview(String voice, {double pitch = 1.0, double speed = 1.0}) async {
+    try {
+      await stop();
+      await _flutterTts.setPitch(pitch);
+      await _flutterTts.setSpeechRate(speed);
+
+      if (voice != 'Default') {
+        final voices = await _flutterTts.getVoices;
+        final selectedVoice = (voices as List<dynamic>).firstWhere(
+          (v) => v['name'].toString() == voice,
+          orElse: () => null,
+        );
+        if (selectedVoice != null) {
+          await _flutterTts.setVoice({
+            "name": selectedVoice['name'],
+            "locale": selectedVoice['locale'],
+          });
+        }
+      } else {
+        await _flutterTts.setLanguage("en-US");
+      }
+
+      await _flutterTts.speak("This is a voice preview.");
+    } catch (e) {
+      debugPrint('Error playing preview: $e');
+    }
+  }
+
   // Stop any ongoing speech
   Future<void> stop() async {
     await _flutterTts.stop();
+  }
+
+  /// Delete temporary WAV and PCM audio files older than 24 hours to save storage.
+  Future<void> cleanupTempFiles() async {
+    try {
+      final List<Directory> checkDirs = [];
+      
+      // Get application documents directory
+      try {
+        final docsDir = await getApplicationDocumentsDirectory();
+        checkDirs.add(Directory(path.join(docsDir.path, _audioDirectoryName)));
+      } catch (_) {}
+
+      // Get external storage directory for Android
+      if (Platform.isAndroid) {
+        try {
+          final extDir = await getExternalStorageDirectory();
+          if (extDir != null) {
+            checkDirs.add(Directory(path.join(extDir.path, _audioDirectoryName)));
+          }
+        } catch (_) {}
+      }
+
+      final now = DateTime.now();
+      int deletedCount = 0;
+
+      for (final dir in checkDirs) {
+        if (await dir.exists()) {
+          final List<FileSystemEntity> entities = await dir.list().toList();
+          for (final entity in entities) {
+            if (entity is File) {
+              final ext = path.extension(entity.path).toLowerCase();
+              if (ext == '.wav' || ext == '.pcm') {
+                final stat = await entity.stat();
+                if (now.difference(stat.modified).inHours > 24) {
+                  await entity.delete();
+                  deletedCount++;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      if (deletedCount > 0) {
+        debugPrint('Cleaned up $deletedCount temporary audio file(s).');
+      }
+    } catch (e) {
+      debugPrint('Error cleaning up temp files: $e');
+    }
   }
 }

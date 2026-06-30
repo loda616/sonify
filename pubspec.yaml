@@ -11,8 +11,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.8
+  path: ^1.9.0
   shared_preferences: ^2.5.2
   provider: ^6.1.2
   path_provider: ^2.1.5
@@ -21,7 +24,10 @@ dependencies:
   tflite_flutter: ^0.11.0
   share_plus: ^10.1.4
   just_audio: ^0.9.46
+  just_audio_background: ^0.0.1-beta.15
+  audioplayers: ^6.5.1
   flutter_tts: ^4.2.2
+  google_fonts: ^6.2.1
   # Native splash packages removed
 
 dev_dependencies:
@@ -29,9 +35,20 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
+  generate: true
   assets:
     - assets/images/
+    - assets/sounds/
 
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/android/play_store_512.png"
+  min_sdk_android: 24
+  adaptive_icon_background: "#1A3684"
+  adaptive_icon_foreground: "assets/icons/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png"

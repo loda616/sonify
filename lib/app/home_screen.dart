@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sonify/features/saved_audios/presentation/screens/saved_audios_screen.dart';
 import 'package:sonify/features/settings/presentation/screens/settings_screen.dart';
-import 'package:sonify/features/text_to_speech/presentaiont/screens/text_to_speech_screen.dart';
+import 'package:sonify/features/text_to_speech/presentation/screens/text_to_speech_screen.dart';
 
 import '../features/theme/presentation/providers/theme_provider.dart';
 import '../core/widgets/theme_switch_widget.dart';
+import '../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -31,18 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Sonify',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.appTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          const ThemeSwitchWidget(),
-          SizedBox(width: 16),
-        ],
+        actions: [const ThemeSwitchWidget(), SizedBox(width: 16)],
       ),
-      body: SafeArea(
-        child: _screens[_selectedIndex],
-      ),
+      body: SafeArea(child: _screens[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -51,20 +47,23 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-        selectedItemColor: isDarkMode ? theme.colorScheme.secondary : theme.colorScheme.primary,
+        selectedItemColor:
+            isDarkMode
+                ? theme.colorScheme.secondary
+                : theme.colorScheme.primary,
         unselectedItemColor: isDarkMode ? const Color(0xFF8E8E8E) : Colors.grey,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.record_voice_over),
-            label: 'Text to Speech',
+            icon: const Icon(Icons.record_voice_over),
+            label: AppLocalizations.of(context)!.homeTabTts,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.library_music),
-            label: 'Saved Audio',
+            icon: const Icon(Icons.library_music),
+            label: AppLocalizations.of(context)!.homeTabSaved,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: const Icon(Icons.settings),
+            label: AppLocalizations.of(context)!.homeTabSettings,
           ),
         ],
       ),

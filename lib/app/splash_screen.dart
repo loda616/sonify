@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import '../core/widgets/wave_progress_indicator.dart';
+import '../l10n/app_localizations.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -10,22 +12,22 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
   late Animation<double> _scaleAnimation;
+  Timer? _navigationTimer;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize animation controller
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
 
-    // Create fade-in animation
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -33,7 +35,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       ),
     );
 
-    // Create scale animation
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -41,19 +42,24 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       ),
     );
 
-    // Start animation
     _animationController.forward();
 
-    // Navigate to home screen after delay
-    Timer(const Duration(seconds: 4), () {
+    _navigationTimer = Timer(const Duration(seconds: 3), () {
+      _navigateToHome();
+    });
+  }
+
+  void _navigateToHome() {
+    if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
-    });
+    }
   }
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _animationController.dispose();
     super.dispose();
   }
@@ -85,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         borderRadius: BorderRadius.circular(40),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 20,
                             spreadRadius: 2,
                           ),
@@ -102,23 +108,18 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
                     const SizedBox(height: 48),
 
-                    // Animated loading indicator
-                    SizedBox(
-                      width: 160,
-                      child: LinearProgressIndicator(
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00D8FF)),
-                        minHeight: 6,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
+                    // Animated wave loading indicator
+                    const WaveProgressIndicator(
+                      width: 180,
+                      height: 40,
                     ),
 
                     const SizedBox(height: 32),
 
                     // Tagline
-                    const Text(
-                      'Transform Text to Speech',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.splashTagline,
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 16,
                         letterSpacing: 0.5,
